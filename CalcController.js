@@ -20,19 +20,31 @@ class CalcController {
     initialize () {
        // setInterval - Função executada em um intervalo de tempo. 
        // Recebe dois parâmetros : uma função  e o espaço de tempo de execução.
+       this.setDisplayDateTime();
         setInterval(() => {
-            this.displayDate = this.currentDate.toLocaleDateString(this._locale);
-            this.displayTime = this.currentDate.toLocaleTimeString(this._locale);
+            this.setDisplayDateTime()
         },1000);
 
     }
     // metodos get e set permitem acessar valores 
+    // set tem função de definir um valor 
     // innerHTML = seleciona o objeto e coloca uma informação nele 
     // em formato HTML.
+
+    // Método criado para iniciar o display de tempo e hora da calculadora.
+    setDisplayDateTime (){
+        this.displayDate = this.currentDate.toLocaleDateString(this._locale , {
+            day:"2-digit",
+            month:"long",
+            year : "numeric"
+            // day, month e year podem ser personalizados, se for de interesse do dev.
+        });
+        this.displayTime = this.currentDate.toLocaleTimeString(this._locale);
+    };
     get displayCalc (){
         return this._displayCalcEl.innerHTML;
     }
-    // set tem função de definir um valor 
+
     set displayCalc (valor){
         this._displayCalcEl.innerHTML = valor;
     }
