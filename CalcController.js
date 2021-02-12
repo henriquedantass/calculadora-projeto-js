@@ -22,10 +22,12 @@ class CalcController {
     // for inicializada. Nesse caso ele ira selecionar o display, data e hora e colocar
     // valores no HTML por meio do "innerHTML"
     initialize() { // metodo para iniciar a calculadora (data e hora)
-        // setInterval - Função executada em um intervalo de tempo. 
-        // Recebe dois parâmetros : uma função  e o espaço de tempo de execução.
+    
+        this.setLastNumberToDisplay();
+
         this.setDisplayDateTime();
-        setInterval(() => {
+
+        setInterval(() => { // setInterval - Função executada em um intervalo de tempo. Recebe dois parâmetros : uma função  e o espaço de tempo de execução.
             this.setDisplayDateTime()
         }, 1000);
 
@@ -38,9 +40,11 @@ class CalcController {
     };
     allClear() { // metodo para dar clear no array do operation
         this._operation = [];
+        this.setLastNumberToDisplay();
     }
     clearEntry() { // metodo para dar clear ao que foi recentemente adicionado ao array
         this._operation.pop();
+        this.setLastNumberToDisplay();
     }
     setError(){ // metodo para apresentar no display caso aconteça algum error
         this.displayCalc = "error";
@@ -72,10 +76,28 @@ class CalcController {
         }
     }
     calc () {  // metodo para realizar as operações dos operadores
-        let last = this._operation.pop();
+        let last;
+
+
+        if (this._operation.length > 3) {
+            last = this._operation.pop();
+        }
+
         let result = eval(this._operation.join(""));  // aqui o array é transformado em string usando o join que aplica os separadores.
-        this._operation = [result, last];
+
+        if (last == '%') {
+
+            result = result / 100;
+            this._operation = [result];
+
+        } else {
+            this._operation = [result];
+            if (last) this._operation.push(last);
+        }
+        
+       
         this.setLastNumberToDisplay();
+
     }
 
     setLastNumberToDisplay(){
@@ -87,8 +109,8 @@ class CalcController {
             lastNumber = this._operation[i];
             break;
         }
-
-        this.displayCalc = lastNumber
+        if (!lastNumber) lastNumber = 0;
+        this.displayCalc = lastNumber;
     }
 
 
@@ -153,6 +175,9 @@ class CalcController {
                 break;
             case 'ponto':
                 this.addOperation('.');
+                break;
+            case 'igual':
+                this.calc();
                 break;
             
             case '0':            
