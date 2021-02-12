@@ -12,6 +12,8 @@ class CalcController {
         this.initButtonsEvents()
 
     }
+
+    
     // DOM - DOCUMENT OBJECT MODEL 
     // MANIPUALÇÃO DO DOM POR MEIO DE EVENTOS
     // document.querrySelector[];
@@ -19,7 +21,7 @@ class CalcController {
     //Initialize é o método que irá realizar as primeiras alterações quando a calculadora
     // for inicializada. Nesse caso ele ira selecionar o display, data e hora e colocar
     // valores no HTML por meio do "innerHTML"
-    initialize() {
+    initialize() { // metodo para iniciar a calculadora (data e hora)
         // setInterval - Função executada em um intervalo de tempo. 
         // Recebe dois parâmetros : uma função  e o espaço de tempo de execução.
         this.setDisplayDateTime();
@@ -28,27 +30,89 @@ class CalcController {
         }, 1000);
 
     }
-    //metodo criado para adicionar 2 eventos simultaneos
-    addEventListenerAll(element, events, fn) {
+    addEventListenerAll(element, events, fn) { //metodo criado para adicionar 2 eventos simultaneos
         events.split(' ').forEach(event => {
             element.addEventListener(event, fn, false);
         })
 
     };
-    allClear() {
+    allClear() { // metodo para dar clear no array do operation
         this._operation = [];
     }
-
-    clearEntry() {
+    clearEntry() { // metodo para dar clear ao que foi recentemente adicionado ao array
         this._operation.pop();
     }
-    setError(){
+    setError(){ // metodo para apresentar no display caso aconteça algum error
         this.displayCalc = "error";
     }
-    addOperation(value){
-        this._operation.push(value);
-        console.log(this._operation)
+    getLastOperation(){  // metodo criado para pegar o ultimo elemento do array de operações
+        return this._operation[this._operation.length-1]; // lenght para saber a quantidade de elementos, e subtrair 1 para pegar o ultimo elemento do array.
+
+
     }
+    setLastOperation (value) { // metodo para retornar a ultima operação na calculadora
+        this._operation[this._operation.length-1] = value;
+    }
+    isOperator(value) { // metodo para identificar operadores
+        
+        if(['+', '-', '*', '%','/'].indexOf(value) > -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+
+    pushOperation(value){
+        this._operation.push(value);
+        if (this._operation.length > 3) {
+            
+            console.log(this._operation);
+
+        }
+    }
+    calc () {  // metodo para realizar as operações dos operadores
+        let last = this._operation.pop();
+        let result = eval(this._operation.join(""));  // aqui o array é transformado em string usando o join que aplica os separadores.
+        this._operation = [result, last];
+    }
+
+    setLastNumberToDisplay(value){
+
+    }
+    addOperation(value){ // metodo para adicionar operações
+
+        if(isNaN(this.getLastOperation())) { // verifica se a ultima operação é ou não é um numero
+           
+
+            if (this.isOperator((value))){  // verifica qual é o operador, pois a ultima operação não é um numero
+    
+                this.setLastOperation(value);
+                
+            } else if (isNaN(value)) {  // outra coisa que não seja numero ou operador
+
+            } else { 
+               
+                this.pushOperation(value);
+
+            }
+        } else {  
+            
+            if (this.isOperator(value)) { // adiciona o operador no array 
+                
+                this.pushOperation(value);
+
+            }   else { // se o value for um numero, esse ultimo numero atribuido ao array é transformar em string e contatenado ao valor do array também em forma de string.
+                 
+            let newValue = this.getLastOperation().toString() + value.toString();
+            this.setLastOperation(parseInt(newValue));  // apos serem transformados em strings o valor é adicionado ao array.
+
+            this.setLastNumberToDisplay(value);
+            }        
+        }
+    }
+
+
 
     execBtn(value) {
         switch (value) {
@@ -61,15 +125,22 @@ class CalcController {
                 break;
 
             case 'porcento':
-                this.addPorcento();
+                this.addOperation('%');
                 break;
             case 'divisao':
+                this.addOperation('/');
                 break;
             case 'multiplicacao':
+                this.addOperation('*');
                 break;
-            case 'subtraçao':
+            case 'subtracao':
+                this.addOperation('-');
                 break;
             case 'soma':
+                this.addOperation('+');
+                break;
+            case 'ponto':
+                this.addOperation('.');
                 break;
             
             case '0':            
@@ -92,9 +163,6 @@ class CalcController {
         }
     }
 
-
-
-
     initButtonsEvents() {
         // let buttons foi uma variavel definida para selecionar todos os botões do HTML, para isso foi usado
         // o querrySelectorAll que seleciona todos os filhos do id #buttons e filhos do id #parts
@@ -113,7 +181,6 @@ class CalcController {
         });
 
     }
-
 
 
     // metodos get e set permitem acessar valores  set tem função de definir um valor 
