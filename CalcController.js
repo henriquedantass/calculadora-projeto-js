@@ -66,7 +66,7 @@ class CalcController {
     pushOperation(value){
         this._operation.push(value);
         if (this._operation.length > 3) {
-            
+            this.calc();
             console.log(this._operation);
 
         }
@@ -75,11 +75,23 @@ class CalcController {
         let last = this._operation.pop();
         let result = eval(this._operation.join(""));  // aqui o array é transformado em string usando o join que aplica os separadores.
         this._operation = [result, last];
+        this.setLastNumberToDisplay();
     }
 
-    setLastNumberToDisplay(value){
+    setLastNumberToDisplay(){
 
+        let lastNumber;
+
+        for (let i = this._operation.length-1; i >= 0; i--)
+            if (!this.isOperator(this._operation[i])) {
+            lastNumber = this._operation[i];
+            break;
+        }
+
+        this.displayCalc = lastNumber
     }
+
+
     addOperation(value){ // metodo para adicionar operações
 
         if(isNaN(this.getLastOperation())) { // verifica se a ultima operação é ou não é um numero
@@ -90,10 +102,11 @@ class CalcController {
                 this.setLastOperation(value);
                 
             } else if (isNaN(value)) {  // outra coisa que não seja numero ou operador
-
+                
             } else { 
                
                 this.pushOperation(value);
+                this.setLastNumberToDisplay();
 
             }
         } else {  
@@ -106,7 +119,6 @@ class CalcController {
                  
             let newValue = this.getLastOperation().toString() + value.toString();
             this.setLastOperation(parseInt(newValue));  // apos serem transformados em strings o valor é adicionado ao array.
-
             this.setLastNumberToDisplay(value);
             }        
         }
