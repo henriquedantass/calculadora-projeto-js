@@ -42,6 +42,8 @@ class CalcController {
     };
     allClear() { // metodo para dar clear no array do operation
         this._operation = [];
+        this.lastOperation = "";
+        this.lastNumber = "";
         this.setLastNumberToDisplay();
     }
     clearEntry() { // metodo para dar clear ao que foi recentemente adicionado ao array
@@ -183,13 +185,33 @@ class CalcController {
             }   else { // se o value for um numero, esse ultimo numero atribuido ao array é transformar em string e contatenado ao valor do array também em forma de string.
                  
             let newValue = this.getLastOperation().toString() + value.toString();
-            this.setLastOperation(parseInt(newValue));  // apos serem transformados em strings o valor é adicionado ao array.
+            this.setLastOperation(newValue);  // apos serem transformados em strings o valor é adicionado ao array.
             this.setLastNumberToDisplay(value);
             }        
         }
     }
 
+    addDot() {
+       // verificar se o numero digitado é um operador
+       // verificar se é vazio
+       // se for um operador ou se for vazio, eu devo adicionar o "0." pois não há numero nem operação.
 
+       let lastOperation = this.getLastOperation();
+    
+       if(typeof lastOperation === 'string' && lastOperation.split('').indexOf('.') > -1) return;
+         
+       if (this.isOperator(lastOperation) || !lastOperation) { // metodo que verifica se é um operador.
+           this.pushOperation('0.');
+       } 
+       
+       // se o metodo verificou que a operação não é vazia e não é um operador, foi adicionado o 0. , mas se a ultima operação for um número, é necessario contatenar o "." com o numero.
+       
+       else {
+           this.setLastOperation(lastOperation.toString() + ".");  // metodo de pegar  a ultima operação.
+       }
+
+       this.setLastNumberToDisplay();   // metodo que adiciona o numero ao display.
+    }
 
     execBtn(value) {
         switch (value) {
@@ -217,7 +239,7 @@ class CalcController {
                 this.addOperation('+');
                 break;
             case 'ponto':
-                this.addOperation('.');
+                this.addDot();
                 break;
             case 'igual':
                 this.calc();
