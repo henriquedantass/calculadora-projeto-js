@@ -12,10 +12,33 @@ class CalcController {
         this._currentDate;
         this.initialize();
         this.initButtonsEvents()
-
+        this.initKeys()
     }
 
-    
+    pasteFromClipboard () {   // metodo para dar ctrl v em dados já copiados e adicionalos ao displau.
+
+        document.addEventListener('paste', event => {
+            let text = event.clipboardData.getData('Text');
+            if (isNaN(text)) {
+
+            } else {
+                this.displayCalc = parseFloat(text);
+            }
+        })
+        
+    }
+    copyToClipboard() {  // meotodo para copiar com ctrl c o que está no display da calculadora.
+
+        let input = document.createElement('input');
+        input.value = this.displayCalc;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('Copy');
+        input.remove(); 
+
+
+
+    }
     // DOM - DOCUMENT OBJECT MODEL 
     // MANIPUALÇÃO DO DOM POR MEIO DE EVENTOS
     // document.querrySelector[];
@@ -32,8 +55,58 @@ class CalcController {
         setInterval(() => { // setInterval - Função executada em um intervalo de tempo. Recebe dois parâmetros : uma função  e o espaço de tempo de execução.
             this.setDisplayDateTime()
         }, 1000);
-
+        this.pasteFromClipboard (); 
     }
+
+    initKeys() {
+        document.addEventListener('keyup', event => {
+           
+            switch (event.key) {
+                case 'Escape':
+                    this.allClear();
+                    break;
+    
+                case 'Backspace':
+                    this.clearEntry();
+                    break;
+
+                case '%':                   
+                case '/':    
+                case '*':
+                case '-':
+                case '+':
+                    this.addOperation(event.key);
+                    break;
+                case '.':
+                case ',':
+                    this.addDot();
+                    break;
+                case '=':
+                case 'Enter':
+                    this.calc();
+                    break;
+                
+                case '0':            
+                case '1':           
+                case '2':          
+                case '3':            
+                case '4':           
+                case '5':           
+                case '6':           
+                case '7':           
+                case '8':           
+                case '9':
+                    this.addOperation(parseInt(event.key));
+                    break;
+
+                case 'c':
+                    if (event.ctrlKey) this.copyToClipboard();
+                    break;
+              
+            }
+        }); 
+    }
+
     addEventListenerAll(element, events, fn) { //metodo criado para adicionar 2 eventos simultaneos
         events.split(' ').forEach(event => {
             element.addEventListener(event, fn, false);
@@ -81,9 +154,16 @@ class CalcController {
     }
 
     getResult () {
-        return eval(this._operation.join(""));
-     }
+        try {
+            return eval(this._operation.join(""));
 
+        } catch (error) {
+            setTimeout(() => {
+                this.setError();
+            },1) 
+        }
+    }
+ 
 
     calc () {  // metodo para realizar as operações dos operadores
 
@@ -307,6 +387,10 @@ class CalcController {
 
     set displayCalc(value) {
         this._displayCalcEl.innerHTML = value;
+        if (value.toString().length > 10) {
+            this.setError();
+            return false ;
+        }
     }
 
     get displayTime() {
